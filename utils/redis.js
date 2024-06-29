@@ -1,4 +1,5 @@
 const redis = require('redis');
+const { promisify } = require('util');
 
 class RedisClient {
   constructor() {
@@ -6,6 +7,10 @@ class RedisClient {
     this.client.on('error', (err) => {
       console.log(err);
     });
+
+    this.getAsync = promisify(this.client.get).bind(this.client);
+    this.setexAsync = promisify(this.client.setex).bind(this.client);
+    this.delAsync = promisify(this.client).bind(this.client);
   }
 
   isAlive() {
@@ -13,23 +18,15 @@ class RedisClient {
   }
 
   async get(key) {
-    return this.client.get(key);
+    return this.getAsync(key);
   }
 
   async set(key, value, duration) {
-    this.client.setex(key, duration, value);
+    this.setexAsync(key, duration, value);
   }
 
   async del(key) {
-    this.client.del(key, (err, reply) => {
-      if (err) {
-        console.log(err);
-      } else if (reply === 1) {
-        console.log(`Key "${key}" deleted successfully`);
-      } else {
-        console.log(`Key "${key}" does not exist`);
-      }
-    });
+    this.delAsync(key);
   }
 }
 
