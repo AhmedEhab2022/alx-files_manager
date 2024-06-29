@@ -15,6 +15,7 @@ class DBClient {
   }
 
   isAlive() {
+    // !! convert to boolean
     return !!this.db;
   }
 
