@@ -1,5 +1,4 @@
 const mongo = require('mongodb');
-const { promisify } = require('util');
 
 class DBClient {
   constructor() {
@@ -13,9 +12,6 @@ class DBClient {
       if (err) console.log(err);
       else this.db = this.client.db(database);
     });
-
-    this.nbUsers = promisify(this.db.collection('users').countDocuments).bind(this.db.collection('users'));
-    this.nbFiles = promisify(this.db.collection('files').countDocuments).bind(this.db.collection('files'));
   }
 
   isAlive() {
@@ -23,11 +19,11 @@ class DBClient {
   }
 
   async nbUsers() {
-    return this.nbUsers();
+    return this.db.collection('users').countDocuments(); 
   }
 
   async nbFiles() {
-    return this.nbFiles();
+    return this.db.collection('files').countDocuments();
   }
 }
 
