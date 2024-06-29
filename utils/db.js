@@ -19,7 +19,7 @@ class DBClient {
   }
 
   async nbUsers() {
-    return this.db.collection('users').countDocuments(); 
+    return this.db.collection('users').countDocuments();
   }
 
   async nbFiles() {
