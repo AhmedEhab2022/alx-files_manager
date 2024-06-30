@@ -1,5 +1,6 @@
 const fs = require('fs');
 const uuid = require('uuid');
+const mime = require('mime-types');
 const redisClient = require('../utils/redis');
 const dbClient = require('../utils/db');
 
@@ -106,6 +107,18 @@ class FilesController {
     if (file.userId.toString() !== userId) return res.status(403).send({ error: 'Forbidden' });
     const updatedFile = await dbClient.updateFileById(fileId, { isPublic: false });
     return res.status(200).send(updatedFile);
+  }
+
+  static async getFile(req, res) {
+    const fileId = req.params.id;
+    const file = await dbClient.findFileById(fileId);
+    if (!file) return res.status(404).send({ error: 'Not found' });
+    if (!file.isPublic) return res.status(403).send({ error: 'Forbidden' });
+    if (file.type === 'folder') return res.status(400).send({ error: 'A folder doesn\'t have content' });
+    const path = file.localPath;
+    const mimeType = mime.lookup(path);
+    res.setHeader('Content-Type', mimeType);
+    return res.status(200).send(fs.readFileSync(path));
   }
 }
 
