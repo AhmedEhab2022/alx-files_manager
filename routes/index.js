@@ -1,6 +1,7 @@
 const express = require('express');
 const AppController = require('../controllers/AppController');
 const UsersController = require('../controllers/UsersController');
+const AuthController = require('../controllers/AuthController');
 
 const app = express();
 
@@ -16,6 +17,18 @@ app.get('/stats', (res, req) => {
 
 app.post('/users', (res, req) => {
   UsersController.postNew(res, req);
+});
+
+app.get('/users/me', (res, req) => {
+  UsersController.getMe(res, req);
+});
+
+app.get('/connect', (res, req) => {
+  AuthController.getConnect(res, req);
+});
+
+app.get('/disconnect', (res, req) => {
+  AuthController.getDisconnect(res, req);
 });
 
 module.exports = app;

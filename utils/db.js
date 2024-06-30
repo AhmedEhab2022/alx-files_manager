@@ -26,6 +26,23 @@ class DBClient {
   async nbFiles() {
     return this.db.collection('files').countDocuments();
   }
+
+  async findUserByEmail(email) {
+    return this.db.collection('users').findOne({ email });
+  }
+
+  async findUserById(id) {
+    return this.db.collection('users').findOne({ _id: new mongo.ObjectID(id) });
+  }
+
+  async findUser(user) {
+    return this.db.collection('users').findOne(user);
+  }
+
+  async createUser(email, password) {
+    const user = await this.db.collection('users').insertOne({ email, password });
+    return { id: user.insertedId, email };
+  }
 }
 
 const dbClient = new DBClient();
