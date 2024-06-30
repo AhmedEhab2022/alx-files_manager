@@ -38,12 +38,14 @@ class FilesController {
       data,
     };
     if (type !== 'folder') {
-      const path = process.env.FOLDER_PATH || '/tmp/files_manager';
+      const path = process.env.FOLDER_PATH || './tmp/files_manager';
       if (!fs.existsSync(path)) fs.mkdirSync(path, { recursive: true });
       // Generate a unique filename
       const filePath = `${path}/${uuid.v4()}`;
+      // decode the base64 string
+      const data = Buffer.from(file.data, 'base64');
       // Write the file to the filesystem
-      fs.writeFileSync(filePath, data, 'utf-8');
+      fs.writeFileSync(filePath, data);
       file.localPath = filePath;
     }
     const newFile = await dbClient.createFile(file);
