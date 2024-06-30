@@ -1,6 +1,5 @@
 const fs = require('fs');
 const uuid = require('uuid');
-const path = require('path');
 const redisClient = require('../utils/redis');
 const dbClient = require('../utils/db');
 
@@ -39,14 +38,12 @@ class FilesController {
       data: data || null,
     };
     if (type !== 'folder') {
-      const folderPath = process.env.FOLDER_PATH || '/tmp/files_manager';
+      const path = process.env.FOLDER_PATH || '/tmp/files_manager';
       if (!fs.existsSync(path)) fs.mkdirSync(path, { recursive: true });
       // Generate a unique filename
-      const filePath = path.join(folderPath, uuid.v4());
-      // Decode the base64 data
-      const fileData = Buffer.from(data, 'base64');
+      const filePath = `${path}/${uuid.v4()}`;
       // Write the file to the filesystem
-      fs.writeFileSync(filePath, fileData);
+      fs.writeFileSync(filePath, data, 'utf-8');
       file.localPath = filePath;
     }
     const newFile = await dbClient.createFile(file);
