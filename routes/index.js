@@ -2,6 +2,7 @@ const express = require('express');
 const AppController = require('../controllers/AppController');
 const UsersController = require('../controllers/UsersController');
 const AuthController = require('../controllers/AuthController');
+const FilesController = require('../controllers/FilesController');
 
 const app = express();
 
@@ -29,6 +30,10 @@ app.get('/connect', (res, req) => {
 
 app.get('/disconnect', (res, req) => {
   AuthController.getDisconnect(res, req);
+});
+
+app.post('/files', (res, req) => {
+  FilesController.postUpload(res, req);
 });
 
 module.exports = app;

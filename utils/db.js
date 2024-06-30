@@ -43,6 +43,19 @@ class DBClient {
     const user = await this.db.collection('users').insertOne({ email, password });
     return { id: user.insertedId, email };
   }
+
+  async createFile(file) {
+    const newFile = await this.db.collection('files').insertOne(file);
+    return newFile.ops[0];
+  }
+
+  async findFileById(id) {
+    return this.db.collection('files').findOne({ _id: new mongo.ObjectID(id) });
+  }
+
+  async findFile(file) {
+    return this.db.collection('files').findOne(file);
+  }
 }
 
 const dbClient = new DBClient();
