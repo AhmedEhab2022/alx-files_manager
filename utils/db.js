@@ -65,6 +65,11 @@ class DBClient {
     const cursor = await this.db.collection('files').find(query).skip(page * 20).limit(20);
     return cursor.toArray();
   }
+
+  async updateFileById(id, updatedFile) {
+    await this.db.collection('files').updateOne({ _id: new mongo.ObjectID(id) }, { $set: updatedFile });
+    return this.findFileById(id);
+  }
 }
 
 const dbClient = new DBClient();
