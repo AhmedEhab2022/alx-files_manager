@@ -7,6 +7,7 @@ const FilesController = require('../controllers/FilesController');
 const app = express();
 
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
 app.get('/status', (res, req) => {
   AppController.getStatus(res, req);
@@ -34,6 +35,14 @@ app.get('/disconnect', (res, req) => {
 
 app.post('/files', (res, req) => {
   FilesController.postUpload(res, req);
+});
+
+app.get('/files/:id', (res, req) => {
+  FilesController.getShow(res, req);
+});
+
+app.get('/files', (res, req) => {
+  FilesController.getIndex(res, req);
 });
 
 module.exports = app;

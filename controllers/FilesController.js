@@ -35,6 +35,7 @@ class FilesController {
       type,
       parentId: parentId || 0,
       isPublic: isPublic || false,
+      data,
     };
     if (type !== 'folder') {
       const path = process.env.FOLDER_PATH || '/tmp/files_manager';
@@ -47,6 +48,32 @@ class FilesController {
     }
     const newFile = await dbClient.createFile(file);
     return res.status(201).send(newFile);
+  }
+
+  static async getShow(req, res) {
+    const token = req.header('X-Token');
+    if (!token) return res.status(401).send({ error: 'Unauthorized' });
+    const userId = await redisClient.get(`auth_${token}`);
+    if (!userId) return res.status(401).send({ error: 'Unauthorized' });
+    const user = await dbClient.findUserById(userId);
+    if (!user) return res.status(401).send({ error: 'Unauthorized' });
+    const fileId = req.params.id;
+    const file = await dbClient.findFileById(fileId);
+    if (!file) return res.status(404).send({ error: 'Not found' });
+    if (file.userId.toString() !== userId) return res.status(403).send({ error: 'Forbidden' });
+    return res.status(200).send(file);
+  }
+
+  static async getIndex(req, res) {
+    const token = req.header('X-Token');
+    if (!token) return res.status(401).send({ error: 'Unauthorized' });
+    const userId = await redisClient.get(`auth_${token}`);
+    if (!userId) return res.status(401).send({ error: 'Unauthorized' });
+    const user = await dbClient.findUserById(userId);
+    if (!user) return res.status(401).send({ error: 'Unauthorized' });
+    const { parentId, page } = req.query;
+    const files = await dbClient.findFiles({ userId, parentId, page });
+    return res.status(200).send(files);
   }
 }
 
