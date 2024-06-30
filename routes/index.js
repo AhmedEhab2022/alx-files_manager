@@ -45,4 +45,12 @@ app.get('/files', (res, req) => {
   FilesController.getIndex(res, req);
 });
 
+app.put('/files/:id/publish', (res, req) => {
+  FilesController.putPublish(res, req);
+});
+
+app.put('/files/:id/unpublish', (res, req) => {
+  FilesController.putUnpublish(res, req);
+});
+
 module.exports = app;
