@@ -3,6 +3,7 @@ const uuid = require('uuid');
 const mime = require('mime-types');
 const Bull = require('bull');
 const { ObjectId } = require('mongodb');
+const path = require('path');
 const redisClient = require('../utils/redis');
 const dbClient = require('../utils/db');
 
@@ -121,15 +122,39 @@ class FilesController {
   }
 
   static async getFile(req, res) {
-    const fileId = req.params.id;
-    const file = await dbClient.findFileById(fileId);
-    if (!file) return res.status(404).send({ error: 'Not found' });
-    if (!file.isPublic) return res.status(404).send({ error: 'Not found' });
-    if (file.type === 'folder') return res.status(400).send({ error: 'A folder doesn\'t have content' });
-    const path = file.localPath;
-    const mimeType = mime.lookup(path);
-    res.setHeader('Content-Type', mimeType);
-    return res.status(200).send(fs.readFileSync(path));
+    try {
+      const fileId = req.params.id;
+      const token = req.header('X-Token');
+      const userId = token ? await redisClient.get(`auth_${token}`) : null;
+
+      const file = await dbClient.findFileById(fileId);
+      if (!file) return res.status(404).send({ error: 'Not found' });
+
+      // Check if the file is public or the user is authenticated and the owner
+      if (!file.isPublic && (!userId || userId !== file.userId.toString())) {
+        return res.status(404).send({ error: 'Not found' });
+      }
+
+      if (file.type === 'folder') {
+        return res.status(400).send({ error: "A folder doesn't have content" });
+      }
+
+      const filePath = path.resolve(file.localPath);
+      if (!fs.existsSync(filePath)) {
+        return res.status(404).send({ error: 'Not found' });
+      }
+
+      // Set the Content-Type response header based on the file type
+      const mimeType = mime.lookup(filePath);
+      res.setHeader('Content-Type', mimeType);
+      // Read the file content
+      const fileContent = fs.readFileSync(filePath);
+      // Send the file content in the response
+      return res.status(200).send(fileContent);
+    } catch (error) {
+      console.error('Error fetching file:', error);
+      return res.status(500).send({ error: 'Internal Server Error' });
+    }
   }
 }
 
