@@ -69,7 +69,7 @@ class FilesController {
     const fileId = req.params.id;
     const file = await dbClient.findFileById(fileId);
     if (!file) return res.status(404).send({ error: 'Not found' });
-    if (file.userId.toString() !== userId) return res.status(403).send({ error: 'Forbidden' });
+    if (file.userId.toString() !== userId) return res.status(404).send({ error: 'Not found' });
     return res.status(200).send(file);
   }
 
@@ -95,7 +95,7 @@ class FilesController {
     const fileId = req.params.id;
     const file = await dbClient.findFileById(fileId);
     if (!file) return res.status(404).send({ error: 'Not found' });
-    if (file.userId.toString() !== userId) return res.status(403).send({ error: 'Forbidden' });
+    if (file.userId.toString() !== userId) return res.status(404).send({ error: 'Not found' });
     const updatedFile = await dbClient.updateFileById(fileId, { isPublic: true });
     return res.status(200).send(updatedFile);
   }
@@ -110,7 +110,7 @@ class FilesController {
     const fileId = req.params.id;
     const file = await dbClient.findFileById(fileId);
     if (!file) return res.status(404).send({ error: 'Not found' });
-    if (file.userId.toString() !== userId) return res.status(403).send({ error: 'Forbidden' });
+    if (file.userId.toString() !== userId) return res.status(404).send({ error: 'Not found' });
     const updatedFile = await dbClient.updateFileById(fileId, { isPublic: false });
     return res.status(200).send(updatedFile);
   }
@@ -119,7 +119,7 @@ class FilesController {
     const fileId = req.params.id;
     const file = await dbClient.findFileById(fileId);
     if (!file) return res.status(404).send({ error: 'Not found' });
-    if (!file.isPublic) return res.status(403).send({ error: 'Forbidden' });
+    if (!file.isPublic) return res.status(404).send({ error: 'Not found' });
     if (file.type === 'folder') return res.status(400).send({ error: 'A folder doesn\'t have content' });
     const path = file.localPath;
     const mimeType = mime.lookup(path);
