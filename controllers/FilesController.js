@@ -1,6 +1,7 @@
 const fs = require('fs');
 const uuid = require('uuid');
 const mime = require('mime-types');
+const Bull = require('bull');
 const redisClient = require('../utils/redis');
 const dbClient = require('../utils/db');
 
@@ -39,7 +40,7 @@ class FilesController {
       data,
     };
     if (type !== 'folder') {
-      const path = process.env.FOLDER_PATH || './tmp/files_manager';
+      const path = process.env.FOLDER_PATH || '/tmp/files_manager';
       if (!fs.existsSync(path)) fs.mkdirSync(path, { recursive: true });
       // Generate a unique filename
       const filePath = `${path}/${uuid.v4()}`;
@@ -49,8 +50,13 @@ class FilesController {
       fs.writeFileSync(filePath, data);
       file.localPath = filePath;
     }
+    if (type === 'image') {
+      const queue = new Bull('images');
+      await queue.add({ userId, fileId: file._id });
+      this.postProcessImage(file);
+    }
     const newFile = await dbClient.createFile(file);
-    return res.status(201).send(newFile);
+    return res.status(201).send({ id: newFile._id, ...file });
   }
 
   static async getShow(req, res) {
