@@ -9,52 +9,52 @@ const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-app.get('/status', (res, req) => {
-  AppController.getStatus(res, req);
+app.get('/status', (req, res) => {
+  AppController.getStatus(req, res);
 });
 
-app.get('/stats', (res, req) => {
-  AppController.getStats(res, req);
+app.get('/stats', (req, res) => {
+  AppController.getStats(req, res);
 });
 
-app.post('/users', (res, req) => {
-  UsersController.postNew(res, req);
+app.post('/users', (req, res) => {
+  UsersController.postNew(req, res);
 });
 
-app.get('/users/me', (res, req) => {
-  UsersController.getMe(res, req);
+app.get('/users/me', (req, res) => {
+  UsersController.getMe(req, res);
 });
 
-app.get('/connect', (res, req) => {
-  AuthController.getConnect(res, req);
+app.get('/connect', (req, res) => {
+  AuthController.getConnect(req, res);
 });
 
-app.get('/disconnect', (res, req) => {
-  AuthController.getDisconnect(res, req);
+app.get('/disconnect', (req, res) => {
+  AuthController.getDisconnect(req, res);
 });
 
-app.post('/files', (res, req) => {
-  FilesController.postUpload(res, req);
+app.post('/files', (req, res) => {
+  FilesController.postUpload(req, res);
 });
 
-app.get('/files/:id', (res, req) => {
-  FilesController.getShow(res, req);
+app.get('/files/:id', (req, res) => {
+  FilesController.getShow(req, res);
 });
 
-app.get('/files', (res, req) => {
-  FilesController.getIndex(res, req);
+app.get('/files', (req, res) => {
+  FilesController.getIndex(req, res);
 });
 
-app.put('/files/:id/publish', (res, req) => {
-  FilesController.putPublish(res, req);
+app.put('/files/:id/publish', (req, res) => {
+  FilesController.putPublish(req, res);
 });
 
-app.put('/files/:id/unpublish', (res, req) => {
-  FilesController.putUnpublish(res, req);
+app.put('/files/:id/unpublish', (req, res) => {
+  FilesController.putUnpublish(req, res);
 });
 
-app.get('/files/:id/data', (res, req) => {
-  FilesController.getFile(res, req);
+app.get('/files/:id/data', (req, res) => {
+  FilesController.getFile(req, res);
 });
 
 module.exports = app;

@@ -59,11 +59,12 @@ class DBClient {
 
   async findFiles(file) {
     const page = file.page || 0;
-    const parentId = file.parentId || 0;
+    const parentId = file.parentId ? new mongo.ObjectID(file.parentId) : '0';
     const { userId } = file;
-    const query = { parentId, userId };
+    const query = { parentId, userId: new mongo.ObjectID(userId) };
     const cursor = await this.db.collection('files').find(query).skip(page * 20).limit(20);
-    return cursor.toArray();
+    const files = await cursor.toArray();
+    return files;
   }
 
   async updateFileById(id, updatedFile) {

@@ -2,6 +2,7 @@ const fs = require('fs');
 const uuid = require('uuid');
 const mime = require('mime-types');
 const Bull = require('bull');
+const { ObjectId } = require('mongodb');
 const redisClient = require('../utils/redis');
 const dbClient = require('../utils/db');
 
@@ -35,7 +36,7 @@ class FilesController {
       userId: user._id,
       name,
       type,
-      parentId: parentId || 0,
+      parentId: parentId ? new ObjectId(parentId) : 0,
       isPublic: isPublic || false,
       data,
     };
@@ -70,7 +71,7 @@ class FilesController {
     const file = await dbClient.findFileById(fileId);
     if (!file) return res.status(404).send({ error: 'Not found' });
     if (file.userId.toString() !== userId) return res.status(404).send({ error: 'Not found' });
-    return res.status(200).send(file);
+    return res.status(200).send({ id: file._id, ...file });
   }
 
   static async getIndex(req, res) {
@@ -82,6 +83,10 @@ class FilesController {
     if (!user) return res.status(401).send({ error: 'Unauthorized' });
     const { parentId, page } = req.query;
     const files = await dbClient.findFiles({ userId, parentId, page });
+    for (const file of files) {
+      file.id = file._id;
+      delete file._id;
+    }
     return res.status(200).send(files);
   }
 
