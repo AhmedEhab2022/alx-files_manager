@@ -15,7 +15,7 @@ class UsersController {
       }
       password = sha1(password);
       const user = await dbClient.createUser(email, password);
-      return response.status(201).send({ id: user.insertedId, email });
+      return response.status(201).send({ id: user.id, email });
     } catch (error) {
       return response.status(500).send({ error: 'Internal Server Error' });
     }
